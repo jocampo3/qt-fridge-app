@@ -3,3 +3,4 @@ supabase
 requests==2.31.0
 pydantic
 typing
+openai==2.11.0

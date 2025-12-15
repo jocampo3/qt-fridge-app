@@ -1,7 +1,8 @@
-from PyQt6.QtWidgets import QCheckBox, QMainWindow, QTabWidget, QVBoxLayout, QHBoxLayout, QLabel, QWidget, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QTabWidget, QVBoxLayout, QLabel, QWidget, QPushButton
 import requests
 from app.api import base_url
-from app.pages.add import create_layout 
+from app.pages.create import create_layout 
+from app.pages.recipes import RecipeWidget
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,6 +17,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.addTab(self.product_layout(), "Inventory")
         self.tabs.addTab(create_layout(), "Create")
+        self.tabs.addTab(RecipeWidget(), "Recipes")
         self.tabs.currentChanged.connect(self.on_tab_change)
         layout.addWidget(self.tabs)
 
@@ -46,9 +48,9 @@ class MainWindow(QMainWindow):
             product_info = "\n".join([f"{key}: {value}" for key, value in product.items()])
             label = QLabel(product_info)
             layout.addWidget(label)
-            button = QPushButton(f"Delete {product.get('name', '')}")
+            button = QPushButton(f"Discard {product.get('name', '')}")
             layout.addWidget(button)
-            button.clicked.connect(lambda checked: self.delete_product(product.get('id')))
+            button.clicked.connect(lambda checked, p=product: self.delete_product(p))
 
         return widget
 
@@ -58,8 +60,13 @@ class MainWindow(QMainWindow):
         data = response.json()
         return data['data']
 
-    def delete_product(self, id):
-        print(f"{id} deleted!")
+    def delete_product(self, product):
+        id = product.get('id', '')
+        url = base_url + '/products/' + str(id)
+        response = requests.delete(url)
+        if response.status_code != 200:
+            print('Could not delete product', response.text)
+            return
 
-        # url = base_url + '/products'
-        # response = requests.delete(url)
+        print('Product deleted successfully!')
+        self.refresh_inventory()

@@ -39,8 +39,8 @@ def create_layout():
         'type': types.currentText(),
         'quantity': int(quantityInput.text()),
         'store': stores.currentText(),
-        'stored_at': calendar.selectedDate().toString('yyyy-MM-dd')
     }))
+
     layout.addWidget(button)
 
     return widget 

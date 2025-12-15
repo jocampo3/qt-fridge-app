@@ -6,5 +6,4 @@ class Product(BaseModel):
     type: str
     quantity: int
     store: str
-    stored_at: str
     discarded_at: Optional[str] = None
